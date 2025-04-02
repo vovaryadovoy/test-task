@@ -1,0 +1,54 @@
+#Create directory to store node_exporter dashboard
+- name: Create /opt/monitoring/dashboards directory
+  file:
+    path: /opt/monitoring/dashboards
+    state: directory
+    owner: 472
+    mode: '0755'
+
+#Create directory for dashboards loading config
+- name: Create /opt/monitoring/provisioning/dashboards directory
+  file:
+    path: /opt/monitoring/provisioning/dashboards
+    state: directory
+    owner: 472
+    mode: '0755'
+
+#Create directory for datasources config
+- name: Create /opt/monitoring/provisioning/datasources directory
+  file:
+    path: /opt/monitoring/provisioning/datasources
+    state: directory
+    owner: 472
+    mode: '0755'
+
+#Make /var/lib/grafana/dashboards visible in grafana
+- name: Copy Dashboards Provisioning config
+  copy:
+    src: files/dashboards.yml
+    dest: /opt/monitoring/provisioning/dashboards/dashboards.yml
+    owner: 472
+    mode: '0644'
+    force: yes
+
+#Make prometheus visible in grafana as datasource
+- name: Copy Grafana Datasources config
+  copy:
+    src: files/data-source.yml
+    dest: /opt/monitoring/provisioning/datasources/prometheus.yml
+    owner: 472
+    mode: '0644'
+    force: yes
+
+
+- name: Copy Grafana dashboard
+  copy:
+    src: files/grafana-dash.json
+    dest: /opt/monitoring/dashboards/node-exporter.json
+    owner: 472
+    mode: '0644'
+    force: yes
+
+#The only way to run docker-compose using builtin ansible functionality is to use shell, unfortunately 
+- name: Run Grafana container
+  shell: docker-compose -f /opt/monitoring/docker-compose.yml up -d grafana

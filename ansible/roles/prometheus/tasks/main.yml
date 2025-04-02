@@ -1,0 +1,8 @@
+- name: Copy Prometheus config
+  copy:
+    src: files/prometheus.yml
+    dest: /opt/monitoring/prometheus.yml
+
+#The only way to run docker-compose using builtin ansible functionality is to use shell, unfortunately 
+- name: Run Prometheus container
+  shell: docker-compose -f /opt/monitoring/docker-compose.yml up -d
